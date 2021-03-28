@@ -1,0 +1,22 @@
+https://docs.docker.com/docker-for-windows/install/
+
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
+https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+
+wsl --set-default-version 2
+
+install ubuntu 20.4 from ms store
+
+https://docs.docker.com/compose/install/
+
+graphical ubuntu:
+https://medium.com/@japheth.yates/the-complete-wsl2-gui-setup-2582828f4577
+
+### RUN
+### cp docker-compose.yml to projectdir
+### 'docker-compose up -d' in projectdir
+
+
+
+
