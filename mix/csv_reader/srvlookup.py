@@ -113,7 +113,8 @@ def rest_serve(data, server_port):
                 if net_ok:
                     json_dumps = json.dumps(row, indent=2)
                 else: json_dumps = str(err_list)
-        return json_dumps
+            return json_dumps, 200
+        return json_dumps, 400   
 
     @app.route('/exit', methods=['GET','POST','PUT'])
     def send_exit():
@@ -169,3 +170,4 @@ jsonList = csv_to_json(csvfile)
 
 if args.rest: rest_serve(jsonList, 8888)
 else: cli_json_print(jsonList, args.serial)
+
