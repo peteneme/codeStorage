@@ -92,7 +92,14 @@ def checkNetwork(row=None):
            net_ok = False
            err_list.append('ip %s is broadcast address' % (row.get('gateway', str())))
 
-    #print(row.get('ip', str()) , row.get('netmask', str()) , row.get('gateway', str()), net_ok, gateway_found_in_range, err_list)
+        ### BTW CHECK IF GATEWAY IS THE SAME AS IP ###
+        if row.get('gateway', str()) == row.get('ip', str()):
+           net_ok = False
+           err_list.append('ip %s is gateway address' % (row.get('ip', str())))
+
+    if args.geterrinfo:
+        print(row.get('ip', str()) , row.get('netmask', str()) , row.get('gateway', \
+            str()), net_ok, gateway_found_in_range, err_list)
     return net_ok, err_list
 
 
@@ -112,9 +119,15 @@ def rest_serve(data, server_port):
                 net_ok, err_list = checkNetwork(row)
                 if net_ok:
                     json_dumps = json.dumps(row, indent=2)
-                else: json_dumps = str(err_list)
-            return json_dumps, 200
-        return json_dumps, 400   
+                    return json_dumps, 200
+                else:
+                    if args.geterrinfo: json_dumps = str(err_list)
+        return json_dumps, 1
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return str(), 1
+
 
     @app.route('/exit', methods=['GET','POST','PUT'])
     def send_exit():
@@ -153,6 +166,9 @@ def cli_parser():
                         help = "specify serial number")
     parser.add_argument("--rest",
                         action = "store_true", dest = 'rest', default = str(),
+                        help = "use rest interface")
+    parser.add_argument("--geterrinfo",
+                        action = "store_true", dest = 'geterrinfo', default = str(),
                         help = "use rest interface")
     args = parser.parse_args()
     return args
