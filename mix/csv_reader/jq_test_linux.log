@@ -1,0 +1,10 @@
+p@ubuntu:~/csv_reader$ python3 srvlookup.py --serial sn1003 | jq '.'
+{
+  "hostname": "server01",
+  "serial": "sn1003",
+  "ip": "192.168.18.19",
+  "netmask": "255.255.255.0",
+  "gateway": "192.168.18.1"
+}
+p@ubuntu:~/csv_reader$ 
+
