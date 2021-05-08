@@ -23,6 +23,9 @@ my_table = st.table(df1)
 
 
 ### read data from yf
+st.write("""
+https://pypi.org/project/yfinance/
+""")
 tickerData = yf.Ticker("AAPL")
 tickerDf = tickerData.history(period='1d', start='2010-1-1', stop='2020-1-1')
 st.line_chart(tickerDf.Close)
