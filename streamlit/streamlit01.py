@@ -4,6 +4,20 @@ import streamlit as st
 import pandas as pd
 import numpy
 
+st.title(""" Just some title...
+""")
+
+
+### just place image
+st.image('./green.jpg')
+
+
+st.write("""
+https://github.github.com/gfm/
+""")
+st.markdown('Streamlit is **_really_ cool**.')
+
+
 st.write("""
 # H1
 ## H2
@@ -30,3 +44,44 @@ tickerData = yf.Ticker("AAPL")
 tickerDf = tickerData.history(period='1d', start='2010-1-1', stop='2020-1-1')
 st.line_chart(tickerDf.Close)
 st.line_chart(tickerDf.Volume)
+
+
+### some more graphs
+st.write("""
+More graphs
+""")
+data = tickerDf.Close
+st.line_chart(data)
+st.area_chart(data)
+st.bar_chart(data)
+#st.pyplot(data)
+#st.altair_chart(data)
+#st.vega_lite_chart(data)
+#st.plotly_chart(data)
+#st.bokeh_chart(data)
+#st.pydeck_chart(data)
+#st.deck_gl_chart(data)
+#st.graphviz_chart(data)
+#st.map(data)
+
+
+### more playings
+st.write("""
+https://share.streamlit.io/daniellewisdl/streamlit-cheat-sheet/app.py
+""")
+
+st.button('Hit me')
+st.checkbox('Check me out')
+st.radio('Radio', [1,2,3])
+st.selectbox('Select', [1,2,3])
+st.multiselect('Multiselect', [1,2,3])
+slider1 = st.slider('Slide me', min_value=0, max_value=10)
+slider2 = st.select_slider('2 options only slide to select', options=[1,'20'])
+st.text_input('Enter some text')
+st.number_input('Enter a number')
+st.text_area('Area for textual entry')
+st.date_input('Date input')
+st.time_input('Time entry')
+st.file_uploader('File uploader')
+st.color_picker('Pick a color')
+
