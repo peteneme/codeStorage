@@ -38,6 +38,8 @@ st.write("""
 
 
 https://docs.streamlit.io/en/stable/api.html
+https://plotly.com/python/
+https://altair-viz.github.io/
 """)
 
 
