@@ -30,6 +30,11 @@ plt.ylabel('some numbers')
 
 plt.axis([0, 6, 0, 20])
 
+
+plt.annotate('local max', xy=(2, 2), xytext=(3, 1.5),
+             arrowprops=dict(facecolor='black', shrink=0.05),
+             )
+
 plt.title('title')
 plt.grid(True)
 
