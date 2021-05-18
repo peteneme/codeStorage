@@ -22,6 +22,8 @@ plt.plot([1, 2, 3, 4])
 plt.plot([1, 2, 3, 4], [0, 3, 7, 4], 'ro')
 
 
+plt.bar([1,2,3,5],[1,2,1,1])
+
 
 plt.xlabel('x axis could be default data', fontsize=14, color='red')
 plt.ylabel('some numbers')
