@@ -4,6 +4,12 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 
 // DEFINITIONS ----------------------------------------------------------------
@@ -26,7 +32,7 @@ int loglevel_set = EMERGENCY_LOGLEVEL;
 // FUNCTION DECLARATIONS ------------------------------------------------------
 void help_text(void);
 void dbg_printf(int level, const char *fmt, ...);
-
+void exit_if_error(void);
 
 
 // FUNCTION DEFINITIONS -------------------------------------------------------
@@ -50,6 +56,15 @@ void dbg_printf(int level, const char *fmt, ...)
     }    
 }
 
+void exit_if_error(void)
+{
+    if (errno>0) {
+        perror("ERR:");
+        exit(errno);
+    }    
+}
+
+
 // MAIN ***********************************************************************
 int main(int argc, char* argv[])
 {
@@ -57,9 +72,6 @@ int main(int argc, char* argv[])
     int keep_alive    = 0;
     bool chunked_mode = false;
     char root_dir[256] = "./";
-
-
-    //dbg_printf("aaaa %s", "bbb\n");
 
     // CLI PARAMETERS PARSING
     if(argc>1) {
@@ -92,9 +104,51 @@ int main(int argc, char* argv[])
     dbg_printf(INFO_LOGLEVEL, "KEEP-ALIVE: %d, ROOT_DIR: %s, LOGLEVEL:%d\n",  keep_alive, root_dir, loglevel_set);
 
 
+    // OPEN SOCKET
+    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
+    struct sockaddr_in serverAddress;
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_port = htons(used_port);
+    serverAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
+    bind(serverSocket, (struct sockaddr *) &serverAddress, sizeof(serverAddress));
 
+    int listening = listen(serverSocket, 10);
+    if (listening < 0) {
+        dbg_printf(ERROR_LOGLEVEL,"Error: The server is not listening.\n");
+        return errno;
+    }
+
+    char httpResponse[512] = "HTTP/1.1 200 OK\r\n\n";
+    char htmlFile[65000] = "";
+    #define READ_BYTES 1000
+    char line[READ_BYTES];
+    FILE *file;
+    char fname[256]; 
+    
+    strcat(fname, root_dir);
+    strcat(fname, "index.html");
+
+    if ((file = fopen(fname, "r"))){
+        while (fgets(line, READ_BYTES, file) != 0) strcat(htmlFile, line);
+        fclose(file);
+        return 1;
+    } else {
+        strcat(htmlFile, "<html><head><title>title</title></head><body>NO index.html FILE found</body></html>");
+    }
+
+    strcat(httpResponse, htmlFile);
+
+    dbg_printf(INFO_LOGLEVEL, "HTML_FILE: %s\nFILE_CONTENT:\n%s\n",  fname, httpResponse);
+    
+    // Wait for a connection, create a connected socket if a connection is pending
+    int clientSocket;
+    while(1) {
+        clientSocket = accept(serverSocket, NULL, NULL);
+        send(clientSocket, httpResponse, sizeof(httpResponse), 0);
+        close(clientSocket);
+    }
 
 
 
