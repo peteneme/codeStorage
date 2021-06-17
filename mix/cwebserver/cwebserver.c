@@ -33,6 +33,7 @@ int loglevel_set = EMERGENCY_LOGLEVEL;
 void help_text(void);
 void dbg_printf(int level, const char *fmt, ...);
 void exit_if_error(void);
+void print_chunk(char *msg, char *chunked_msg);
 
 
 // FUNCTION DEFINITIONS -------------------------------------------------------
@@ -53,8 +54,14 @@ void dbg_printf(int level, const char *fmt, ...)
         va_start(args, fmt);
         vfprintf(stderr, fmt, args);
         va_end(args);
-    }    
+    }
 }
+
+void print_chunk(char *msg, char *chunked_msg) {
+    sprintf(chunked_msg, "\r\n%X\r\n%s", (int)strlen(msg), msg);
+}
+
+
 
 void exit_if_error(void)
 {
@@ -140,6 +147,13 @@ int main(int argc, char* argv[])
     if (keep_alive) strcat(httpResponse, "Connection: keep-alive\r\n");
     if (chunked_mode) strcat(httpResponse, "Transfer-Encoding: chunked\r\n");
     strcat(httpResponse, "Content-Type: text/html\r\n\r\n");
+
+    // CHUNKED MODE htmlFile ENCODING
+    if (chunked_mode) {
+        char chunked_msg[10000];
+        print_chunk(htmlFile, chunked_msg);
+        strcpy(htmlFile, chunked_msg);
+    }
 
     // JOIN HTTP+HTML
     strcat(httpResponse, htmlFile);
