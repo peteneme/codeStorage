@@ -40,7 +40,7 @@ void help_text(void) {
     printf("Input CLI parameters:\n");
     printf("--help               - Print help\n");
     printf("--port NUMBER        - Webserver PORT NUMBER\n");
-    printf("--keep-alive SECONDS - Switch on keep-alive by inserting NUMBER of seconds\n");
+    printf("--keep-alive         - Switch on keep-alive, by default is off\n");
     printf("--root_dir DIRECTORY - Set webserver root directory, by default is ./ \n");
     printf("--chunked            - Switch on http1.1 chunked mode, by default is off\n");
     printf("--loglevel NUMBER    - Switch on debug level, by default is OFF, use 0..7, 7 is debug\n");
@@ -69,7 +69,7 @@ void exit_if_error(void)
 int main(int argc, char* argv[])
 {
     int used_port     = DEFAULT_PORT;
-    int keep_alive    = 0;
+    bool keep_alive    = false;
     bool chunked_mode = false;
     char root_dir[256] = "./";
 
@@ -83,11 +83,8 @@ int main(int argc, char* argv[])
                 if (counter+1<argc)
                     if ((atoi(argv[counter+1])>0) && (atoi(argv[counter+1])<=0xffff))                
                         used_port = atoi(argv[counter+1]);
-            if (strcmp(argv[counter], "--keep-alive")==0) 
-                // JUST IGNORE NON-INTERGER VALUES OR NEXT OR NON-EXISTING PARAMETERS
-                if (counter+1<argc) 
-                    if (atoi(argv[counter+1])>0)                
-                        keep_alive = atoi(argv[counter+1]);
+            if (strcmp(argv[counter], "--keep-alive")==0)               
+                keep_alive = true;
             if (strcmp(argv[counter], "--root_dir")==0) 
                 // JUST IGNORE NON-EXISTING PARAMETERS
                 if (counter+1<argc) sprintf(root_dir, "%s", argv[counter+1]);                                                      
@@ -101,7 +98,7 @@ int main(int argc, char* argv[])
     }
     // PRINT ACCEPTED PARAMETERS
     dbg_printf(INFO_LOGLEVEL, "BINARY: %s, USED_PORT: %d, CHUNKED_MODE: %s, ", argv[0], used_port, chunked_mode ? "true" : "false");
-    dbg_printf(INFO_LOGLEVEL, "KEEP-ALIVE: %d, ROOT_DIR: %s, LOGLEVEL:%d\n",  keep_alive, root_dir, loglevel_set);
+    dbg_printf(INFO_LOGLEVEL, "KEEP-ALIVE: %s, ROOT_DIR: %s, LOGLEVEL:%d\n",  keep_alive ? "true" : "false", root_dir, loglevel_set);
 
 
     // OPEN SOCKET
@@ -120,7 +117,7 @@ int main(int argc, char* argv[])
         return errno;
     }
 
-    char httpResponse[512] = "HTTP/1.1 200 OK\r\n\n";
+    char httpResponse[512] = "HTTP/1.1 200 OK\r\n";
     char htmlFile[65000] = "";
     #define READ_BYTES 1000
     char line[READ_BYTES];
@@ -135,9 +132,16 @@ int main(int argc, char* argv[])
         fclose(file);
         return 1;
     } else {
-        strcat(htmlFile, "<html><head><title>title</title></head><body>NO index.html FILE found</body></html>");
+        strcpy(httpResponse, "HTTP/1.1 404 Not found\r\n");
+        strcat(htmlFile, "<html><head><title>title</title></head><body>404 - file not found.</body></html>");
     }
 
+    // CONSTRUCT HEADER FORMAT
+    if (keep_alive) strcat(httpResponse, "Connection: keep-alive\r\n");
+    if (chunked_mode) strcat(httpResponse, "Transfer-Encoding: chunked\r\n");
+    strcat(httpResponse, "Content-Type: text/html\r\n\r\n");
+
+    // JOIN HTTP+HTML
     strcat(httpResponse, htmlFile);
 
     dbg_printf(INFO_LOGLEVEL, "HTML_FILE: %s\nFILE_CONTENT:\n%s\n",  fname, httpResponse);
