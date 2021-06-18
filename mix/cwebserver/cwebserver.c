@@ -137,7 +137,6 @@ int main(int argc, char* argv[])
     if ((file = fopen(fname, "r"))){
         while (fgets(line, READ_BYTES, file) != 0) strcat(htmlFile, line);
         fclose(file);
-        return 1;
     } else {
         strcpy(httpResponse, "HTTP/1.1 404 Not found\r\n");
         strcat(htmlFile, "<html><head><title>title</title></head><body>404 - file not found.</body></html>");
