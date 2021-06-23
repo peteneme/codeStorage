@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import sys, io, collections, six, json, requests, subprocess
 
-from jinja2 import Template
+from jinja2 import Template, Environment, BaseLoader
 
 
 txt = """My favorite numbers: {% for n in range(1,10) %}
@@ -27,13 +27,40 @@ print(tr)
 
 
 parameters = {'parameter1':'text', 'parameter2':'text', 'parameter3':'text', 'parameter4':'text'}
-input_jinja2_template = '''
-{% for key, value in parameters.items() %}
-<p>{{key}}<input type = "{{value}}" name = "{{key}}" /></p>{% endfor %}
-'''
+input_jinja2_template = '''{% for key, value in parameters.items() %}<p>{{key}}<input type = "{{value}}" name = "{{key}}" /></p>
+{% endfor %}'''
 t = Template(input_jinja2_template)
-tr = t.render(parameters=parameters)
+trm = t.render(parameters=parameters)
+print(trm)
+
+
+txt ="""<HTML>
+<HEADER>header</HEADER>
+<BODY>body
+{{ menu }}</BODY>
+</HTML>
+"""
+t = Template(txt)
+tr = t.render(menu=trm)
 print(tr)
+
+
+# with open('menu.html','w') as f:
+#     f.write(tr)
+    
+# txt ="""<HTML>
+# <HEADER>header</HEADER>
+# <BODY>body
+#    {% include 'menu.html' %}
+# </BODY>
+# </HTML>
+# """
+# t = Environment(loader=BaseLoader()).from_string(txt)
+# tr = t.render()
+# print(tr)
+
+
+
 
 
 colors = ["red", "blue"]
