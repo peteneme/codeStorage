@@ -69,3 +69,6 @@ print(f"{a:o}")
 
 # scientific
 print(f"{a:e}")
+
+
+### https://miguendes.me/73-examples-to-help-you-master-pythons-f-strings#how-to-concatenate-f-strings
