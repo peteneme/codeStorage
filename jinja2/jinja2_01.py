@@ -31,7 +31,18 @@ input_jinja2_template = '''
 {% for key, value in parameters.items() %}
 <p>{{key}}<input type = "{{value}}" name = "{{key}}" /></p>{% endfor %}
 '''
-
 t = Template(input_jinja2_template)
 tr = t.render(parameters=parameters)
+print(tr)
+
+
+colors = ["red", "blue"]
+txt = """Colors: {% if truth %}{% for color in colors %} 
+{{color}}{% endfor %}{% else %}No colors{% endif %}"""
+t = Template(txt)
+tr = t.render(colors=colors, truth = True)
+print(tr)
+
+t = Template(txt)
+tr = t.render(colors=colors, truth = False)
 print(tr)
