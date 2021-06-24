@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import sys, io, collections, six, json, requests, subprocess
 
-from jinja2 import Template, Environment, BaseLoader
+from jinja2 import Template, Environment, BaseLoader, FileSystemLoader
 
 
 txt = """My favorite numbers: {% for n in range(1,10) %}
@@ -33,6 +33,35 @@ t = Template(input_jinja2_template)
 trm = t.render(parameters=parameters)
 print(trm)
 
+### https://stackoverflow.com/questions/39288706/jinja2-load-template-from-string-typeerror-no-loader-for-this-environment-spec
+with open('menu.html','w') as f:
+    f.write(tr)
+    
+# txt ="""<HTML>
+# <HEADER>header</HEADER>
+# <BODY>body
+#    {% include 'menu.html' %}
+# </BODY>
+# </HTML>
+# """
+# t = Environment(loader=FileSystemLoader(searchpath="./")).get_template('menu.html')
+# tr = t.render()
+# print(tr)
+
+
+txt ="""<HTML>
+<HEADER>header</HEADER>
+<BODY>body
+   {% include 'menu.html' %}
+</BODY>
+</HTML>
+"""
+t = Environment(loader=FileSystemLoader(searchpath="./")).from_string(txt)
+tr = t.render()
+print(tr)
+
+
+
 
 txt ="""<HTML>
 <HEADER>header</HEADER>
@@ -45,22 +74,9 @@ tr = t.render(menu=trm)
 print(tr)
 
 
-# with open('menu.html','w') as f:
-#     f.write(tr)
-    
-# txt ="""<HTML>
-# <HEADER>header</HEADER>
-# <BODY>body
-#    {% include 'menu.html' %}
-# </BODY>
-# </HTML>
-# """
-# t = Environment(loader=BaseLoader()).from_string(txt)
-# tr = t.render()
-# print(tr)
 
 
-
+### https://www.youtube.com/watch?v=bxhXQG1qJPM
 
 
 colors = ["red", "blue"]
